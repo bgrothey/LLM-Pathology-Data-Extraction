@@ -70,22 +70,22 @@ Ollama
 
 Repository Structure
 
-├── README.pdf
-├── python_scripts
-│   ├── inference_GPT4.py
-│   ├── inference_llama2.py
-│   ├── inference_llama3.py
-│   ├── inference_4bit_models.py
-│   ├── inference_4bit_cov.py
-│   └── json_processing.py
-├── r_scripts
-│   ├── analysis_16bit.R
-│   ├── analysis_4bit.R
-│   ├── analysis_16bit_fun.R
-│   └── analysis_4bit_fun.R
-└── data
-    ├── Database_example.xlsx
-    └── Report_example.xlsx
+* README.pdf
+* python_scripts
+   * inference_GPT4.py
+   * inference_llama2.py
+   * inference_llama3.py
+   * inference_4bit_models.py
+   * inference_4bit_cov.py
+   * json_processing.py
+* r_scripts
+   * analysis_16bit.R
+   * analysis_4bit.R
+   * analysis_16bit_fun.R
+   * analysis_4bit_fun.R
+* data
+   * Database_example.xlsx
+   * Report_example.xlsx
 
 
 Script Descriptions
