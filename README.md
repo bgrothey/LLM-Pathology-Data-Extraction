@@ -1,2 +1,252 @@
-# LLM-Pathology-Data-Extraction
-This repository contains a comprehensive suite of scripts designed to extract, process, analyze, and visualize structured data from pathology reports.
+# LLM-Pathology-Data-Extraction 
+This repository contains a comprehensive suite of scripts designed to extract, process, analyze, and visualize structured data from pathology reports. The workflow utilizes various models and APIs, including OpenAI's GPT-4, Hugging Face's LLaMA models, and 4-bit quantized model versions provided by Ollama. Additionally, R scripts are provided for detailed statistical analysis and visualization of the extracted data.
+
+
+Table of Contents
+* Requirements
+* Script Descriptions
+    * Python Scripts
+        * inference_GPT4.py
+        * inference_llama2.py
+        * inference_llama3.py
+        * inference_4bit_models.py
+        * json_processing.py
+    * R Scripts
+        * analysis_16bit.R
+        * analysis_16bit_fun.R
+        * analysis_4bit.R
+        * analysis_4bit_fun.R
+* Usage
+    * Python Scripts
+        * Running inference_GPT4.py
+        * Running inference_llama2.py and inference_llama3.py
+        * Running inference_4bit_models.py
+        * Running json_processing.py
+    * R Scripts
+        * Running analysis_16bit.R
+        * Running analysis_4bit.R
+* Output Files
+    * From inference_GPT4.py, inference_llama2.py, inference_llama3.py, inference_4bit_models.py and inference_4bit_cov.py
+    * From json_processing.py
+    * From R Scripts
+* Acknowledgements
+
+
+Requirements
+
+Python Environment
+* Python Version: 3.7 or higher
+* Python Packages: Install via pip install -r requirements.txt
+    * openai
+    * huggingface_hub
+    * pandas
+    * numpy
+    * tqdm
+    * requests
+    * json
+    * os
+    * sys
+* API Keys:
+    * OpenAI API Key: Required for inference_GPT4.py
+    * Hugging Face API Token: Required for inference_llama2.py and inference_llama3.py
+
+R Environment
+* R Version: 4.0 or higher
+* R Packages: Install using install.packages("package_name") or appropriate methods
+    * tidyverse
+    * data.table
+    * ggplot2
+    * dplyr
+    * readr
+    * stringr
+    * ggpubr
+    * reshape2
+    * scales
+    * gridExtra
+    * cowplot
+
+Ollama
+
+
+Repository Structure
+
+├── README.pdf
+├── python_scripts
+│   ├── inference_GPT4.py
+│   ├── inference_llama2.py
+│   ├── inference_llama3.py
+│   ├── inference_4bit_models.py
+│   ├── inference_4bit_cov.py
+│   └── json_processing.py
+├── r_scripts
+│   ├── analysis_16bit.R
+│   ├── analysis_4bit.R
+│   ├── analysis_16bit_fun.R
+│   └── analysis_4bit_fun.R
+└── data
+    ├── Database_example.xlsx
+    └── Report_example.xlsx
+
+
+Script Descriptions
+
+Python Scripts
+
+`inference_GPT4.py`
+* Description: This script extracts structured data from pathology reports using the OpenAI GPT-4 API.
+* Key Features:
+    * Input: .xlsx file with Barcode and Report columns with IDs and corresponding pathology reports. (See Report_example.xlsx)
+    * Processing: Sends each report to GPT-4 with a predefined zero-shot prompt.
+    * Output: Saves extracted data/JSON files in a specified output directory and logs errors.
+* Dependencies:
+    * OpenAI API key must be added in the script under the variable ‘openai_api_key’.
+
+`inference_llama2.py`
+* Description: Similar to inference_GPT4.py, but utilizes the Hugging Face API to extract data using the LLaMA2 model.
+* Key Features:
+    * Input: .xlsx file with Barcode and Report columns with IDs and corresponding pathology reports. (See Report_example.xlsx)
+    * Model Specification: Define the LLaMA2 model variant through the ‘model’ variable.
+    * Output: Saves extracted data/JSON files in a specified output directory and logs errors.
+    * Authentication: Requires a valid Hugging Face API token, which has to be specified under the section ‘Login huggingface’.
+
+`inference_llama3.py`
+* Description: Extends the functionality of inference_llama2.py by using the LLaMA3 model for data extraction via Hugging Face API.
+* Key Features:
+    * Input and Output: Identical to inference_llama2.py.
+    * Model Specification: Set to use LLaMA3 model through the model variable.
+    * Authentication: Requires a valid Hugging Face API token, which has to be specified under the section ‘Login huggingface’.
+
+`inference_4bit_models.py`
+* Description: Leverages 4-bit quantized versions of LLaMA2, LLaMA3, and Mistral models provided by Ollama for efficient data extraction.
+* Key Features:
+    * Input: .xlsx file with Barcode and Report columns with IDs and corresponding pathology reports. (See Report_example.xlsx)
+    * Model Selection: Specify desired model (LLaMA2, LLaMA3, or Mistral) via the ‘model’ variable.
+    * Efficiency: Reduced computational overhead while maintaining performance.
+    * Output: Saves extracted data as JSON files; includes error logging.
+    * Dependencies: Requires Ollama setup with access to 4-bit quantized models.
+
+`inference_4bit_cov.py`
+* Description: This script uses the JSON files generated by inference_4bit_models.py to perform a chain of verification prompting approach. It controls and corrects the initial JSON outputs to improve accuracy.
+* Key Features:
+    * Input: JSON files generated by inference_4bit_models.py. In addition .xlsx file with Barcode and Report columns with IDs and corresponding pathology reports. (See Report_example.xlsx)
+    * Output: Corrected JSON files after verification prompting.
+    * Dependencies: Requires the JSON outputs from inference_4bit_models.py and related setup.
+
+`json_processing.py`
+* Description: Processes JSON files generated by inference scripts to compile results, compare the data against the ground truth annotations, and prepare them for further analysis.
+* Key Features:
+    * Input: JSON files generated by the LLMs and a .xlsx file with ground truth data. For the format of the ground truth data table see Database_example.xlsx.
+    * Concatenation: Merges individual JSON files into a comprehensive results table.
+    * Accuracy Calculation: Compares extracted data with ground truth data of our study.
+    * Multi-Report Handling: Prioritizes the most recent report; consults older reports if necessary.
+    * Validation: Generates status reports indicating JSON structure integrity and preprocessing requirements.
+    * Summary: Produces a key frequency report to identify redundant or missing keys.
+* Dependencies:
+    * Requires JSON files from the inference scripts and the ground truth data frame from our study for accuracy comparison.
+
+R Scripts
+
+`analysis_16bit.R`
+* Description: Performs comprehensive statistical analysis and visualization of data extracted by full-precision models (GPT-4, LLaMA2, LLaMA3).
+* Key Features:
+    * Data Processing: Reads processed results from json_processing.py and prepares datasets for analysis.
+    * Statistical Analysis: Computes performance metrics such as accuracy, precision, recall, and F1-scores.
+    * Visualization: Generates figures illustrating model performance comparisons, error rates, and other relevant statistics.
+    * Reporting: Outputs summarized statistics and plots to the results directory.
+* Dependencies:
+    * Relies on functions defined in analysis_16bit_fun.R.
+    * Requires processed data files from json_processing.py.
+
+`analysis_4bit.R`
+* Description: Conducts statistical analysis and visualization for data extracted by 4-bit quantized models (LLaMA2, LLaMA3, Mistral).
+* Key Features:
+    * Data Processing: Similar to analysis_16bit.R, tailored for 4-bit model outputs.
+    * Statistical Analysis: Evaluates and compares performance metrics across different quantized models.
+    * Visualization: Produces figures showcasing efficiency and performance trade-offs.
+    * Reporting: Outputs summarized statistics and plots to the results directory.
+* Dependencies:
+    * Utilizes functions from analysis_4bit_fun.R.
+    * Requires processed data files from json_processing.py.
+
+`analysis_16bit_fun.R`
+* Description: A collection of reusable functions to support statistical analysis and plotting in analysis_16bit.R.
+* Usage:
+    * Sourced within analysis_16bit.R to provide modular and maintainable code structure.
+
+`analysis_4bit_fun.R`
+* Description: A collection of reusable functions to support statistical analysis and plotting in analysis_4bit.R.
+* Usage:
+    * Sourced within analysis_4bit.R for organized and efficient analysis workflows.
+
+
+Usage
+
+Python Scripts
+
+Manually specify parameters in the script:
+
+Running `inference_GPT4.py`
+* <report_filename>: Path to the input .xlsx file containing pathology reports. (See Report_example.xlsx)
+* <openai_api_key>: Your OpenAI API key for authentication.
+* <output_dir>: Directory where JSON output files will be saved.
+* <stderr_out>: Directory where stderr output will be saved.
+
+Running `inference_llama2.py and inference_llama3.py`
+* <token>: Your Hugging Face API token.
+* <model>: Specific model variant to use via the huggingface API (e.g., meta-llama/Llama-2-13b-chat-hf, meta-llama/Meta-Llama-3-8B-Instruct).
+* <report_filename>: Path to the input .xlsx file containing pathology reports. (See Report_example.xlsx)
+* <output_dir>: Directory where JSON output files will be saved.
+* <stderr_out>: Directory where stderr output will be saved.
+
+Running `inference_4bit_models.py`
+* <report_filename>: Path to the input .xlsx file containing pathology reports. (See Report_example.xlsx)
+* <output_dir>: Directory where JSON output files will be saved.
+* <stderr_out>: Directory where stderr output will be saved.
+* <model>: Select a model you have downloaded. Available model versions can be found on the Ollama homepage.
+    * Note: Ensure Ollama is properly installed and configured with access to the specified models.
+
+Running `inference_4bit_cov.py`
+* <report_filename>: Path to the input .xlsx file containing pathology reports. (See Report_example.xlsx)
+* <input_dir>: Path to a directory containing the Zero-shot JSON files.
+* <output_dir>: Directory where JSON output files will be saved.
+* <stderr_out>: Directory where stderr output will be saved.
+* <model>: Select a model you have downloaded. Available model versions can be found on the Ollama homepage.
+    * Note: Ensure Ollama is properly installed and configured with access to the specified models.
+
+Running `json_processing.py`
+* <json_directory>: Directory containing JSON files from inference scripts.
+* <path_to_annotations>: Path to the ground truth annotations .xlsx file. (See Database_example.xlsx)
+* <output_directory>: Directory where processed results will be saved.
+
+R Scripts
+
+Running `analysis_16bit.R` + `Running analysis_4bit.R`
+* Ensure that the processed results from json_processing.py etc. are available and correctly referenced in the scripts.
+* Modify any paths or parameters within the scripts as needed for your specific environment or data structure.
+* Depending on folder structure and file names some adaptations of the scripts are needed.
+
+
+Output Files
+
+From inference_GPT4.py, inference_llama2.py, inference_llama3.py, inference_4bit_models.py and inference_4bit_cov.py
+* JSON Files: Structured data for each pathology report saved in the specified output directory.
+* Error Logs: Logs detailing issues encountered during JSON exporting.
+
+From json_processing.py
+* Results Table (*_results.csv): Consolidated data comparing extracted information with ground truth annotations.
+* Key Frequency per Report (*_var_stats.tsv): Summary occurrences of JSON keys per files (checks if a key occurs more than once in a JSON).
+* JSON Status Report (json_status.tsv): Details on the structural integrity and preprocessing needs of each JSON file.
+
+From R Scripts
+* Statistical Analysis Reports:
+    * Detailed performance metrics and comparisons
+* Figures and Plots:
+    * High-quality visualizations (e.g., PNG, PDF formats) illustrating model performances, error analyses, and other relevant statistics
+* Supplementary Materials:
+    * Additional tables and charts
+
+
+Acknowledgements
+We acknowledge the use of OpenAI's GPT-4, Hugging Face's LLaMA models, and Ollama's 4-bit quantized models in this project.
+
+
